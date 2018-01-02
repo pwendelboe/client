@@ -79,6 +79,7 @@ export const initialCanUserPerform: RPCTypes.TeamOperation = {
   setMemberShowcase: false,
   changeOpenTeam: false,
   leaveTeam: false,
+  changeTarsEnabled: false,
 }
 
 const userIsInTeamHelper = (state: TypedState, username: string, service: Service, teamname: string) =>
