@@ -108,6 +108,7 @@ var nonDeletableMessageTypesByDeleteHistory = []MessageType{
 	MessageType_TLFNAME,
 	MessageType_HEADLINE,
 	MessageType_DELETEHISTORY,
+	MessageType_RETENTION,
 }
 
 func DeletableMessageTypesByDelete() []MessageType {

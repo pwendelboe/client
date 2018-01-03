@@ -214,6 +214,7 @@ const (
 	MessageType_LEAVE              MessageType = 10
 	MessageType_SYSTEM             MessageType = 11
 	MessageType_DELETEHISTORY      MessageType = 12
+	MessageType_RETENTION          MessageType = 13
 )
 
 func (o MessageType) DeepCopy() MessageType { return o }
@@ -232,6 +233,7 @@ var MessageTypeMap = map[string]MessageType{
 	"LEAVE":              10,
 	"SYSTEM":             11,
 	"DELETEHISTORY":      12,
+	"RETENTION":          13,
 }
 
 var MessageTypeRevMap = map[MessageType]string{
@@ -248,6 +250,7 @@ var MessageTypeRevMap = map[MessageType]string{
 	10: "LEAVE",
 	11: "SYSTEM",
 	12: "DELETEHISTORY",
+	13: "RETENTION",
 }
 
 type TopicType int
@@ -970,19 +973,20 @@ func (o OutboxInfo) DeepCopy() OutboxInfo {
 }
 
 type MessageClientHeader struct {
-	Conv          ConversationIDTriple     `codec:"conv" json:"conv"`
-	TlfName       string                   `codec:"tlfName" json:"tlfName"`
-	TlfPublic     bool                     `codec:"tlfPublic" json:"tlfPublic"`
-	MessageType   MessageType              `codec:"messageType" json:"messageType"`
-	Supersedes    MessageID                `codec:"supersedes" json:"supersedes"`
-	Deletes       []MessageID              `codec:"deletes" json:"deletes"`
-	Prev          []MessagePreviousPointer `codec:"prev" json:"prev"`
-	DeleteHistory *MessageDeleteHistory    `codec:"deleteHistory,omitempty" json:"deleteHistory,omitempty"`
-	Sender        gregor1.UID              `codec:"sender" json:"sender"`
-	SenderDevice  gregor1.DeviceID         `codec:"senderDevice" json:"senderDevice"`
-	MerkleRoot    *MerkleRoot              `codec:"merkleRoot,omitempty" json:"merkleRoot,omitempty"`
-	OutboxID      *OutboxID                `codec:"outboxID,omitempty" json:"outboxID,omitempty"`
-	OutboxInfo    *OutboxInfo              `codec:"outboxInfo,omitempty" json:"outboxInfo,omitempty"`
+	Conv            ConversationIDTriple     `codec:"conv" json:"conv"`
+	TlfName         string                   `codec:"tlfName" json:"tlfName"`
+	TlfPublic       bool                     `codec:"tlfPublic" json:"tlfPublic"`
+	MessageType     MessageType              `codec:"messageType" json:"messageType"`
+	Supersedes      MessageID                `codec:"supersedes" json:"supersedes"`
+	Deletes         []MessageID              `codec:"deletes" json:"deletes"`
+	Prev            []MessagePreviousPointer `codec:"prev" json:"prev"`
+	DeleteHistory   *MessageDeleteHistory    `codec:"deleteHistory,omitempty" json:"deleteHistory,omitempty"`
+	RetentionPolicy *MessageRetentionPolicy  `codec:"retentionPolicy,omitempty" json:"retentionPolicy,omitempty"`
+	Sender          gregor1.UID              `codec:"sender" json:"sender"`
+	SenderDevice    gregor1.DeviceID         `codec:"senderDevice" json:"senderDevice"`
+	MerkleRoot      *MerkleRoot              `codec:"merkleRoot,omitempty" json:"merkleRoot,omitempty"`
+	OutboxID        *OutboxID                `codec:"outboxID,omitempty" json:"outboxID,omitempty"`
+	OutboxInfo      *OutboxInfo              `codec:"outboxInfo,omitempty" json:"outboxInfo,omitempty"`
 }
 
 func (o MessageClientHeader) DeepCopy() MessageClientHeader {
@@ -1021,6 +1025,13 @@ func (o MessageClientHeader) DeepCopy() MessageClientHeader {
 			tmp := (*x).DeepCopy()
 			return &tmp
 		})(o.DeleteHistory),
+		RetentionPolicy: (func(x *MessageRetentionPolicy) *MessageRetentionPolicy {
+			if x == nil {
+				return nil
+			}
+			tmp := (*x).DeepCopy()
+			return &tmp
+		})(o.RetentionPolicy),
 		Sender:       o.Sender.DeepCopy(),
 		SenderDevice: o.SenderDevice.DeepCopy(),
 		MerkleRoot: (func(x *MerkleRoot) *MerkleRoot {

@@ -126,7 +126,8 @@
         "JOIN_9",
         "LEAVE_10",
         "SYSTEM_11",
-        "DELETEHISTORY_12"
+        "DELETEHISTORY_12",
+        "RETENTION_13"
       ],
       "go": "nostring"
     },
@@ -752,6 +753,13 @@
             "MessageDeleteHistory"
           ],
           "name": "deleteHistory"
+        },
+        {
+          "type": [
+            null,
+            "MessageRetentionPolicy"
+          ],
+          "name": "retentionPolicy"
         },
         {
           "type": "gregor1.UID",

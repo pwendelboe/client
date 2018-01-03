@@ -68,6 +68,7 @@ export const commonMessageType = {
   leave: 10,
   system: 11,
   deletehistory: 12,
+  retention: 13,
 }
 
 export const commonNotificationKind = {
@@ -308,6 +309,10 @@ export const localPostMetadataRpcChannelMap = (configKeys: Array<string>, reques
 
 export const localPostMetadataRpcPromise = (request: LocalPostMetadataRpcParam): Promise<LocalPostMetadataResult> => new Promise((resolve, reject) => engine()._rpcOutgoing('chat.1.local.postMetadata', request, (error: RPCError, result: LocalPostMetadataResult) => (error ? reject(error) : resolve(result))))
 
+export const localPostRetentionPolicyRpcChannelMap = (configKeys: Array<string>, request: LocalPostRetentionPolicyRpcParam): EngineChannel => engine()._channelMapRpcHelper(configKeys, 'chat.1.local.postRetentionPolicy', request)
+
+export const localPostRetentionPolicyRpcPromise = (request: LocalPostRetentionPolicyRpcParam): Promise<LocalPostRetentionPolicyResult> => new Promise((resolve, reject) => engine()._rpcOutgoing('chat.1.local.postRetentionPolicy', request, (error: RPCError, result: LocalPostRetentionPolicyResult) => (error ? reject(error) : resolve(result))))
+
 export const localPostTextNonblockRpcChannelMap = (configKeys: Array<string>, request: LocalPostTextNonblockRpcParam): EngineChannel => engine()._channelMapRpcHelper(configKeys, 'chat.1.local.postTextNonblock', request)
 
 export const localPostTextNonblockRpcPromise = (request: LocalPostTextNonblockRpcParam): Promise<LocalPostTextNonblockResult> => new Promise((resolve, reject) => engine()._rpcOutgoing('chat.1.local.postTextNonblock', request, (error: RPCError, result: LocalPostTextNonblockResult) => (error ? reject(error) : resolve(result))))
@@ -315,6 +320,12 @@ export const localPostTextNonblockRpcPromise = (request: LocalPostTextNonblockRp
 export const localPreviewConversationByIDLocalRpcChannelMap = (configKeys: Array<string>, request: LocalPreviewConversationByIDLocalRpcParam): EngineChannel => engine()._channelMapRpcHelper(configKeys, 'chat.1.local.previewConversationByIDLocal', request)
 
 export const localPreviewConversationByIDLocalRpcPromise = (request: LocalPreviewConversationByIDLocalRpcParam): Promise<LocalPreviewConversationByIDLocalResult> => new Promise((resolve, reject) => engine()._rpcOutgoing('chat.1.local.previewConversationByIDLocal', request, (error: RPCError, result: LocalPreviewConversationByIDLocalResult) => (error ? reject(error) : resolve(result))))
+
+export const localRetentionPolicyType = {
+  none: 0,
+  retain: 1,
+  expire: 2,
+}
 
 export const localRetryPostRpcChannelMap = (configKeys: Array<string>, request: LocalRetryPostRpcParam): EngineChannel => engine()._channelMapRpcHelper(configKeys, 'chat.1.local.RetryPost', request)
 
@@ -846,6 +857,8 @@ export type LocalPostMetadataNonblockRpcParam = {|conversationID: ConversationID
 
 export type LocalPostMetadataRpcParam = {|conversationID: ConversationID, tlfName: String, tlfPublic: Boolean, channelName: String, identifyBehavior: Keybase1.TLFIdentifyBehavior, incomingCallMap?: IncomingCallMapType, waitingHandler?: WaitingHandlerType|}
 
+export type LocalPostRetentionPolicyRpcParam = {|conversationID: ConversationID, tlfName: String, tlfPublic: Boolean, identifyBehavior: Keybase1.TLFIdentifyBehavior, policy: MessageRetentionPolicy, incomingCallMap?: IncomingCallMapType, waitingHandler?: WaitingHandlerType|}
+
 export type LocalPostTextNonblockRpcParam = {|conversationID: ConversationID, tlfName: String, tlfPublic: Boolean, body: String, clientPrev: MessageID, outboxID?: ?OutboxID, identifyBehavior: Keybase1.TLFIdentifyBehavior, incomingCallMap?: IncomingCallMapType, waitingHandler?: WaitingHandlerType|}
 
 export type LocalPreviewConversationByIDLocalRpcParam = {|convID: ConversationID, incomingCallMap?: IncomingCallMapType, waitingHandler?: WaitingHandlerType|}
@@ -878,7 +891,7 @@ export type MessageAttachment = {|object: Asset, preview?: ?Asset, previews?: ?A
 
 export type MessageAttachmentUploaded = {|messageID: MessageID, object: Asset, previews?: ?Array<Asset>, metadata: Bytes|}
 
-export type MessageBody = {messageType: 1, text: ?MessageText} | {messageType: 2, attachment: ?MessageAttachment} | {messageType: 3, edit: ?MessageEdit} | {messageType: 4, delete: ?MessageDelete} | {messageType: 5, metadata: ?MessageConversationMetadata} | {messageType: 7, headline: ?MessageHeadline} | {messageType: 8, attachmentuploaded: ?MessageAttachmentUploaded} | {messageType: 9, join: ?MessageJoin} | {messageType: 10, leave: ?MessageLeave} | {messageType: 11, system: ?MessageSystem} | {messageType: 12, deletehistory: ?MessageDeleteHistory}
+export type MessageBody = {messageType: 1, text: ?MessageText} | {messageType: 2, attachment: ?MessageAttachment} | {messageType: 3, edit: ?MessageEdit} | {messageType: 4, delete: ?MessageDelete} | {messageType: 5, metadata: ?MessageConversationMetadata} | {messageType: 7, headline: ?MessageHeadline} | {messageType: 8, attachmentuploaded: ?MessageAttachmentUploaded} | {messageType: 9, join: ?MessageJoin} | {messageType: 10, leave: ?MessageLeave} | {messageType: 11, system: ?MessageSystem} | {messageType: 12, deletehistory: ?MessageDeleteHistory} | {messageType: 13, retention: ?MessageRetentionPolicy}
 
 export type MessageBoxed = {|version: MessageBoxedVersion, serverHeader?: ?MessageServerHeader, clientHeader: MessageClientHeader, headerCiphertext: SealedData, bodyCiphertext: EncryptedData, verifyKey: Bytes, keyGeneration: Int|}
 
@@ -887,7 +900,7 @@ export type MessageBoxedVersion =
   | 1 // V1_1
   | 2 // V2_2
 
-export type MessageClientHeader = {|conv: ConversationIDTriple, tlfName: String, tlfPublic: Boolean, messageType: MessageType, supersedes: MessageID, deletes?: ?Array<MessageID>, prev?: ?Array<MessagePreviousPointer>, deleteHistory?: ?MessageDeleteHistory, sender: Gregor1.UID, senderDevice: Gregor1.DeviceID, merkleRoot?: ?MerkleRoot, outboxID?: ?OutboxID, outboxInfo?: ?OutboxInfo|}
+export type MessageClientHeader = {|conv: ConversationIDTriple, tlfName: String, tlfPublic: Boolean, messageType: MessageType, supersedes: MessageID, deletes?: ?Array<MessageID>, prev?: ?Array<MessagePreviousPointer>, deleteHistory?: ?MessageDeleteHistory, retentionPolicy?: ?MessageRetentionPolicy, sender: Gregor1.UID, senderDevice: Gregor1.DeviceID, merkleRoot?: ?MerkleRoot, outboxID?: ?OutboxID, outboxInfo?: ?OutboxInfo|}
 
 export type MessageClientHeaderVerified = {|conv: ConversationIDTriple, tlfName: String, tlfPublic: Boolean, messageType: MessageType, prev?: ?Array<MessagePreviousPointer>, sender: Gregor1.UID, senderDevice: Gregor1.DeviceID, merkleRoot?: ?MerkleRoot, outboxID?: ?OutboxID, outboxInfo?: ?OutboxInfo|}
 
@@ -912,6 +925,8 @@ export type MessageLeave = {||}
 export type MessagePlaintext = {|clientHeader: MessageClientHeader, messageBody: MessageBody|}
 
 export type MessagePreviousPointer = {|id: MessageID, hash: Hash|}
+
+export type MessageRetentionPolicy = {typ: 1, retain: ?RetentionPolicyRetain} | {typ: 2, expire: ?RetentionPolicyExpire}
 
 export type MessageServerHeader = {|messageID: MessageID, supersededBy: MessageID, ctime: Gregor1.Time|}
 
@@ -952,6 +967,7 @@ export type MessageType =
   | 10 // LEAVE_10
   | 11 // SYSTEM_11
   | 12 // DELETEHISTORY_12
+  | 13 // RETENTION_13
 
 export type MessageUnboxed = {state: 1, valid: ?MessageUnboxedValid} | {state: 2, error: ?MessageUnboxedError} | {state: 3, outbox: ?OutboxRecord} | {state: 4, placeholder: ?MessageUnboxedPlaceholder}
 
@@ -1114,6 +1130,15 @@ export type RemoteUpdateTypingRemoteRpcParam = {|uid: Gregor1.UID, deviceID: Gre
 
 export type RemoteUserTypingUpdate = {|uid: Gregor1.UID, deviceID: Gregor1.DeviceID, convID: ConversationID, typing: Boolean|}
 
+export type RetentionPolicyExpire = {|age: Gregor1.DurationSec|}
+
+export type RetentionPolicyRetain = {||}
+
+export type RetentionPolicyType =
+  | 0 // NONE_0
+  | 1 // RETAIN_1
+  | 2 // EXPIRE_2
+
 export type S3Params = {|bucket: String, objectKey: String, accessKey: String, acl: String, regionName: String, regionEndpoint: String, regionBucketEndpoint: String|}
 
 export type SealedData = {|v: Int, e: Bytes, n: Bytes|}
@@ -1260,6 +1285,7 @@ type LocalPostLocalNonblockResult = PostLocalNonblockRes
 type LocalPostLocalResult = PostLocalRes
 type LocalPostMetadataNonblockResult = PostLocalNonblockRes
 type LocalPostMetadataResult = PostLocalRes
+type LocalPostRetentionPolicyResult = PostLocalRes
 type LocalPostTextNonblockResult = PostLocalNonblockRes
 type LocalPreviewConversationByIDLocalResult = JoinLeaveConversationLocalRes
 type LocalSetAppNotificationSettingsLocalResult = SetAppNotificationSettingsLocalRes

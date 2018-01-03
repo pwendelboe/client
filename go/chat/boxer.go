@@ -1054,9 +1054,21 @@ func (b *Boxer) preBoxCheck(ctx context.Context, messagePlaintext chat1.MessageP
 		if *dhHeader != body {
 			return e("header-body mismatch")
 		}
+	case chat1.MessageType_RETENTION:
+		body := messagePlaintext.MessageBody.Retention()
+		rHeader := messagePlaintext.ClientHeader.RetentionPolicy
+		if rHeader == nil {
+			return e("missing header")
+		}
+		if *rHeader != body {
+			return e("header-body mismatch")
+		}
 	default:
 		if messagePlaintext.ClientHeader.DeleteHistory != nil {
 			return e("cannot have delete-history header")
+		}
+		if messagePlaintext.ClientHeader.RetentionPolicy != nil {
+			return e("cannot have retention policy header")
 		}
 	}
 
@@ -1534,7 +1546,7 @@ func (b *Boxer) compareHeadersMBV1(ctx context.Context, hServer chat1.MessageCli
 		return NewPermanentUnboxingError(NewHeaderMismatchError("MessageType"))
 	}
 
-	// Note: Supersedes, Deletes, and DeleteHistory are not checked because they are not
+	// Note: Supersedes, Deletes, and some other fields are not checked because they are not
 	//       part of MessageClientHeaderVerified.
 
 	// Prev
