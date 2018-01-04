@@ -56,7 +56,6 @@ function preprocessMarkdown(markdown: string, meta: ?MarkdownMeta) {
   })
 }
 
-// TODO: Pass down list of channels.
 function isValidChannel(meta: ?MarkdownMeta, channel: string): boolean {
   if (!meta) {
     return false
