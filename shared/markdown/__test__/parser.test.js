@@ -203,6 +203,10 @@ this is a code block with two newline above\`\`\`
   it('parses mentions correctly', () => {
     check('hello there @marco@keybase')
   })
+  it('parses mentions with underscores correctly', () => {
+    check('hello there @ryan_singer@keybase @m_@keybase @dan_t@keybase')
+    check('hello there @invalid__name_@keybase')
+  })
   it('parses mentions correctly, regardless of case', () => {
     check('hello there @marco@Keybase')
   })

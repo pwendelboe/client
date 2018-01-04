@@ -633,6 +633,57 @@ Object {
 }
 `;
 
+exports[`Markdown parser parses mentions with underscores correctly 1`] = `
+Object {
+  "children": Array [
+    Object {
+      "children": Array [
+        "hello there ",
+        Object {
+          "children": Array [
+            "ryan_singer",
+          ],
+          "service": "keybase",
+          "type": "mention",
+        },
+        " ",
+        Object {
+          "children": Array [
+            "m_",
+          ],
+          "service": "keybase",
+          "type": "mention",
+        },
+        " ",
+        Object {
+          "children": Array [
+            "dan_t",
+          ],
+          "service": "keybase",
+          "type": "mention",
+        },
+      ],
+      "type": "text-block",
+    },
+  ],
+  "type": "markup",
+}
+`;
+
+exports[`Markdown parser parses mentions with underscores correctly 2`] = `
+Object {
+  "children": Array [
+    Object {
+      "children": Array [
+        "hello there @invalid__name_@keybase",
+      ],
+      "type": "text-block",
+    },
+  ],
+  "type": "markup",
+}
+`;
+
 exports[`Markdown parser parses more code blocks correctly 1`] = `
 Object {
   "children": Array [
