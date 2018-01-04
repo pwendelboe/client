@@ -56,6 +56,15 @@ function preprocessMarkdown(markdown: string, meta: ?MarkdownMeta) {
   })
 }
 
+// TODO: Pass down list of channels.
+function isValidChannel(meta: ?MarkdownMeta, channel: string): boolean {
+  if (!meta) {
+    return false
+  }
+
+  return true
+}
+
 export function parseMarkdown(
   markdown: ?string,
   markdownCreateComponent: MarkdownCreateComponent,
@@ -68,8 +77,7 @@ export function parseMarkdown(
   try {
     return processAST(
       parser.parse(preprocessMarkdown(markdown || '', meta), {
-        // TODO: Pass down list of channels.
-        isValidChannel: (s: string) => !!meta,
+        isValidChannel: (channel: string) => isValidChannel(meta, channel),
       }),
       markdownCreateComponent
     )
