@@ -66,7 +66,13 @@ export function parseMarkdown(
     return plainText
   }
   try {
-    return processAST(parser.parse(preprocessMarkdown(markdown || '', meta)), markdownCreateComponent)
+    return processAST(
+      parser.parse(preprocessMarkdown(markdown || '', meta), {
+        // TODO: Pass down list of channels.
+        isValidChannel: (s: string) => !!meta,
+      }),
+      markdownCreateComponent
+    )
   } catch (err) {
     logger.error('Markdown parsing failed:', err)
     return markdown
