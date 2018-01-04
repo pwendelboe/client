@@ -131,7 +131,8 @@ MentionlessMention
 Channel
  = ChannelMarker children:([0-9a-zA-Z_-]+) & {
   const channel = flatten(children)[0]
-  return channel.length > 0 && channel.length <= 20
+  return channel.length > 0 && channel.length <= 20 &&
+    options && options.isValidChannel && options.isValidChannel(channel)
 } { return {type: 'channel', children: flatten(children) } }
 
 InCodeBlock
