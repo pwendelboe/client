@@ -84,7 +84,7 @@ export const initialCanUserPerform: RPCTypes.TeamOperation = {
 const userIsInTeamHelper = (state: TypedState, username: string, service: Service, teamname: string) =>
   service === 'Keybase' ? userIsInTeam(state, teamname, username) : false
 
-const getConvIdsFromTeamName = (state: TypedState, teamname: string): I.Set<string> =>
+const getConvIdsFromTeamName = (state: TypedState, teamname: string): I.Set<ChatTypes.ConversationIDKey> =>
   state.entities.teams.teamNameToConvIDs.get(teamname, I.Set())
 
 const getTeamNameFromConvID = (state: TypedState, conversationIDKey: ChatTypes.ConversationIDKey) =>
