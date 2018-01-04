@@ -117,14 +117,20 @@ __INLINE_RULE__<StrikeInline, !StrikeMarker>
 Strike
  = StrikeMarker !WhiteSpace children:StrikeInline StrikeMarker !(StrikeMarker / NormalChar) { return {type: 'strike', children: flatten(children)} }
 
-// children grammar adapted from username regexp in libkb/checkers.go.
+// children test adapted from CheckUsername in libkb/checkers.go.
 Mention
- = MentionMarker children:([a-zA-Z0-9]+[a-zA-Z0-9_]?)+ MentionMarker service:ValidMentionService { return {type: 'mention', children: flatten(children), service: service.toLowerCase()} }
+ = MentionMarker children:([a-zA-Z0-9]+[a-zA-Z0-9_]?)+ MentionMarker service:ValidMentionService & {
+ const mention = flatten(children)[0]
+ return mention.length >= 2 && mention.length <= 16
+} { return {type: 'mention', children: flatten(children), service: service.toLowerCase()} }
 
 // Same as Mention above, but is just returns text
 // Useful if you don't want a mention in certain contexts (like in a code block)
 MentionlessMention
- = MentionMarker children:([a-zA-Z0-9]+[a-zA-Z0-9_]?)+ MentionMarker service:ValidMentionService { return prefix('@', children) }
+ = MentionMarker children:([a-zA-Z0-9]+[a-zA-Z0-9_]?)+ MentionMarker service:ValidMentionService & {
+ const mention = flatten(children)[0]
+ return mention.length >= 2 && mention.length <= 16
+} { return prefix('@', children) }
 
 InCodeBlock
  = children:(MentionlessMention / (!Ticks3 .))+ {return children }
