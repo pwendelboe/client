@@ -68,6 +68,13 @@ function messageCreateComponent(type, key, children, options) {
       return <Box key={key}>{children}</Box>
     case 'mention':
       return <Mention username={children[0]} service={options.service || ''} key={key} style={wrapStyle} />
+    case 'channel':
+      // TODO: Render as link.
+      return (
+        <Text type="Body" key={key} style={codeSnippetStyle}>
+          {children}
+        </Text>
+      )
     case 'inline-code':
       return (
         <Text type="Body" key={key} style={codeSnippetStyle}>

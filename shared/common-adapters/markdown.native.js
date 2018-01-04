@@ -160,6 +160,13 @@ function messageCreateComponent(style, allowFontScaling) {
             allowFontScaling={allowFontScaling}
           />
         )
+      case 'channel':
+        // TODO: Render as link.
+        return (
+          <Text type="Body" key={key} style={codeSnippetStyle} allowFontScaling={allowFontScaling}>
+            {children}
+          </Text>
+        )
       case 'emoji':
         return (
           <EmojiIfExists

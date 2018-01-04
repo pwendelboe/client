@@ -79,6 +79,7 @@ ItalicMarker = "_"
 EmojiMarker = ":"
 QuoteBlockMarker = ">"
 MentionMarker = "@"
+ChannelMarker = "#"
 
 ValidMentionService = "keybase" / "Keybase"
 ClosingMentionMarker = MentionMarker ValidMentionService
@@ -87,7 +88,7 @@ ClosingMentionMarker = MentionMarker ValidMentionService
 PunctuationMarker = [()[\].,!?]
 
 SpecialChar
- = EscapeMarker / StrikeMarker / MentionMarker / BoldMarker / ItalicMarker / EmojiMarker / QuoteBlockMarker / Ticks1 / PunctuationMarker { return text() }
+ = EscapeMarker / StrikeMarker / MentionMarker / ChannelMarker / BoldMarker / ItalicMarker / EmojiMarker / QuoteBlockMarker / Ticks1 / PunctuationMarker { return text() }
 
 EscapedChar
  = EscapeMarker char:SpecialChar { return char }
@@ -125,6 +126,10 @@ Mention
 // Useful if you don't want a mention in certain contexts (like in a code block)
 MentionlessMention
  = MentionMarker children:([a-zA-Z0-9][a-zA-Z0-9_]*) MentionMarker service:ValidMentionService { return prefix('@', children) }
+
+// children grammar adapted from topic name regexp in chat/msgchecker/plaintext_checker.go.
+Channel
+ = ChannelMarker children:([0-9a-zA-Z_-]+) { return {type: 'channel', children: flatten(children) } }
 
 InCodeBlock
  = children:(MentionlessMention / (!Ticks3 .))+ {return children }
