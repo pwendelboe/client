@@ -127,9 +127,12 @@ Mention
 MentionlessMention
  = MentionMarker children:([a-zA-Z0-9][a-zA-Z0-9_]*) MentionMarker service:ValidMentionService { return prefix('@', children) }
 
-// children grammar adapted from topic name regexp in chat/msgchecker/plaintext_checker.go.
+// children test adapted from validateTopicName in chat/msgchecker/plaintext_checker.go.
 Channel
- = ChannelMarker children:([0-9a-zA-Z_-]+) { return {type: 'channel', children: flatten(children) } }
+ = ChannelMarker children:([0-9a-zA-Z_-]+) & {
+  const channel = flatten(children)[0]
+  return channel.length > 0 && channel.length <= 20
+} { return {type: 'channel', children: flatten(children) } }
 
 InCodeBlock
  = children:(MentionlessMention / (!Ticks3 .))+ {return children }
