@@ -266,54 +266,6 @@
       ]
     },
     {
-      "type": "enum",
-      "name": "RetentionPolicyType",
-      "symbols": [
-        "NONE_0",
-        "RETAIN_1",
-        "EXPIRE_2"
-      ]
-    },
-    {
-      "type": "variant",
-      "name": "MessageRetentionPolicy",
-      "switch": {
-        "type": "RetentionPolicyType",
-        "name": "typ"
-      },
-      "cases": [
-        {
-          "label": {
-            "name": "RETAIN",
-            "def": false
-          },
-          "body": "RetentionPolicyRetain"
-        },
-        {
-          "label": {
-            "name": "EXPIRE",
-            "def": false
-          },
-          "body": "RetentionPolicyExpire"
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "RetentionPolicyRetain",
-      "fields": []
-    },
-    {
-      "type": "record",
-      "name": "RetentionPolicyExpire",
-      "fields": [
-        {
-          "type": "gregor1.DurationSec",
-          "name": "age"
-        }
-      ]
-    },
-    {
       "type": "record",
       "name": "AssetMetadataImage",
       "fields": [
@@ -618,13 +570,6 @@
             "def": false
           },
           "body": "MessageDeleteHistory"
-        },
-        {
-          "label": {
-            "name": "RETENTION",
-            "def": false
-          },
-          "body": "MessageRetentionPolicy"
         }
       ]
     },
@@ -2721,31 +2666,6 @@
       ],
       "response": "PostLocalRes"
     },
-    "postRetentionPolicy": {
-      "request": [
-        {
-          "name": "conversationID",
-          "type": "ConversationID"
-        },
-        {
-          "name": "tlfName",
-          "type": "string"
-        },
-        {
-          "name": "tlfPublic",
-          "type": "boolean"
-        },
-        {
-          "name": "identifyBehavior",
-          "type": "keybase1.TLFIdentifyBehavior"
-        },
-        {
-          "name": "policy",
-          "type": "MessageRetentionPolicy"
-        }
-      ],
-      "response": "PostLocalRes"
-    },
     "SetConversationStatusLocal": {
       "request": [
         {
@@ -3246,6 +3166,32 @@
         {
           "name": "convID",
           "type": "ConversationID"
+        }
+      ],
+      "response": null
+    },
+    "setConvRetentionLocal": {
+      "request": [
+        {
+          "name": "convID",
+          "type": "ConversationID"
+        },
+        {
+          "name": "policy",
+          "type": "RetentionPolicy"
+        }
+      ],
+      "response": null
+    },
+    "setTeamRetentionLocal": {
+      "request": [
+        {
+          "name": "teamID",
+          "type": "keybase1.TeamID"
+        },
+        {
+          "name": "policy",
+          "type": "RetentionPolicy"
         }
       ],
       "response": null

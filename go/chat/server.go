@@ -60,6 +60,8 @@ type Server struct {
 	cachedThreadDelay *time.Duration
 }
 
+var _ chat1.LocalInterface = (*Server)(nil)
+
 func NewServer(g *globals.Context, store *AttachmentStore, serverConn ServerConnection,
 	uiSource UISource) *Server {
 	return &Server{
@@ -1085,35 +1087,6 @@ func (h *Server) PostDeleteHistoryByAge(ctx context.Context, arg chat1.PostDelet
 		IdentifyBehavior: arg.IdentifyBehavior,
 		Upto:             upto,
 	})
-}
-
-func (h *Server) PostRetentionPolicy(ctx context.Context, arg chat1.PostRetentionPolicyArg) (res chat1.PostLocalRes, err error) {
-	ctx = Context(ctx, h.G(), arg.IdentifyBehavior, nil, h.identNotifier)
-	defer h.Trace(ctx, func() error { return err }, "PostDeleteHistoryUpto")()
-
-	typ, err := arg.Policy.Typ()
-	if err != nil {
-		return res, err
-	}
-	switch typ {
-	case chat1.RetentionPolicyType_NONE:
-		return res, fmt.Errorf("missing retention policy type")
-	case chat1.RetentionPolicyType_EXPIRE:
-		h.Debug(ctx, "PostRetentionPolicy type:%v age:%v", typ, arg.Policy.Expire().Age)
-	default:
-		h.Debug(ctx, "PostRetentionPolicy type:%v", typ)
-	}
-
-	var parg chat1.PostLocalArg
-	parg.ConversationID = arg.ConversationID
-	parg.IdentifyBehavior = arg.IdentifyBehavior
-	parg.Msg.ClientHeader.MessageType = chat1.MessageType_DELETEHISTORY
-	parg.Msg.ClientHeader.TlfName = arg.TlfName
-	parg.Msg.ClientHeader.TlfPublic = arg.TlfPublic
-	parg.Msg.ClientHeader.RetentionPolicy = &arg.Policy
-	parg.Msg.MessageBody = chat1.NewMessageBodyWithRetention(arg.Policy)
-
-	return h.PostLocal(ctx, parg)
 }
 
 func (h *Server) GenerateOutboxID(ctx context.Context) (res chat1.OutboxID, err error) {
@@ -2612,4 +2585,22 @@ func (h *Server) AddTeamMemberAfterReset(ctx context.Context,
 
 	teamID := keybase1.TeamID(conv.Info.Triple.Tlfid.String())
 	return teams.ReAddMemberAfterReset(ctx, h.G().ExternalG(), teamID, arg.Username)
+}
+
+func (h *Server) SetConvRetentionLocal(ctx context.Context, arg chat1.SetConvRetentionLocalArg) (err error) {
+	defer h.Trace(ctx, func() error { return err }, "SetConvRetention(%v, %v)", arg.ConvID, arg.Policy.Summary())()
+	_, err = h.remoteClient().SetConvRetention(ctx, chat1.SetConvRetentionArg{
+		ConvID: arg.ConvID,
+		Policy: arg.Policy,
+	})
+	return err
+}
+
+func (h *Server) SetTeamRetentionLocal(ctx context.Context, arg chat1.SetTeamRetentionLocalArg) (err error) {
+	defer h.Trace(ctx, func() error { return err }, "SetTeamRetention(%v, %v)", arg.TeamID, arg.Policy.Summary())()
+	_, err = h.remoteClient().SetTeamRetention(ctx, chat1.SetTeamRetentionArg{
+		TeamID: arg.TeamID,
+		Policy: arg.Policy,
+	})
+	return err
 }

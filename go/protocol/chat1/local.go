@@ -414,128 +414,6 @@ func (o MessageDeleteHistory) DeepCopy() MessageDeleteHistory {
 	}
 }
 
-type RetentionPolicyType int
-
-const (
-	RetentionPolicyType_NONE   RetentionPolicyType = 0
-	RetentionPolicyType_RETAIN RetentionPolicyType = 1
-	RetentionPolicyType_EXPIRE RetentionPolicyType = 2
-)
-
-func (o RetentionPolicyType) DeepCopy() RetentionPolicyType { return o }
-
-var RetentionPolicyTypeMap = map[string]RetentionPolicyType{
-	"NONE":   0,
-	"RETAIN": 1,
-	"EXPIRE": 2,
-}
-
-var RetentionPolicyTypeRevMap = map[RetentionPolicyType]string{
-	0: "NONE",
-	1: "RETAIN",
-	2: "EXPIRE",
-}
-
-func (e RetentionPolicyType) String() string {
-	if v, ok := RetentionPolicyTypeRevMap[e]; ok {
-		return v
-	}
-	return ""
-}
-
-type MessageRetentionPolicy struct {
-	Typ__    RetentionPolicyType    `codec:"typ" json:"typ"`
-	Retain__ *RetentionPolicyRetain `codec:"retain,omitempty" json:"retain,omitempty"`
-	Expire__ *RetentionPolicyExpire `codec:"expire,omitempty" json:"expire,omitempty"`
-}
-
-func (o *MessageRetentionPolicy) Typ() (ret RetentionPolicyType, err error) {
-	switch o.Typ__ {
-	case RetentionPolicyType_RETAIN:
-		if o.Retain__ == nil {
-			err = errors.New("unexpected nil value for Retain__")
-			return ret, err
-		}
-	case RetentionPolicyType_EXPIRE:
-		if o.Expire__ == nil {
-			err = errors.New("unexpected nil value for Expire__")
-			return ret, err
-		}
-	}
-	return o.Typ__, nil
-}
-
-func (o MessageRetentionPolicy) Retain() (res RetentionPolicyRetain) {
-	if o.Typ__ != RetentionPolicyType_RETAIN {
-		panic("wrong case accessed")
-	}
-	if o.Retain__ == nil {
-		return
-	}
-	return *o.Retain__
-}
-
-func (o MessageRetentionPolicy) Expire() (res RetentionPolicyExpire) {
-	if o.Typ__ != RetentionPolicyType_EXPIRE {
-		panic("wrong case accessed")
-	}
-	if o.Expire__ == nil {
-		return
-	}
-	return *o.Expire__
-}
-
-func NewMessageRetentionPolicyWithRetain(v RetentionPolicyRetain) MessageRetentionPolicy {
-	return MessageRetentionPolicy{
-		Typ__:    RetentionPolicyType_RETAIN,
-		Retain__: &v,
-	}
-}
-
-func NewMessageRetentionPolicyWithExpire(v RetentionPolicyExpire) MessageRetentionPolicy {
-	return MessageRetentionPolicy{
-		Typ__:    RetentionPolicyType_EXPIRE,
-		Expire__: &v,
-	}
-}
-
-func (o MessageRetentionPolicy) DeepCopy() MessageRetentionPolicy {
-	return MessageRetentionPolicy{
-		Typ__: o.Typ__.DeepCopy(),
-		Retain__: (func(x *RetentionPolicyRetain) *RetentionPolicyRetain {
-			if x == nil {
-				return nil
-			}
-			tmp := (*x).DeepCopy()
-			return &tmp
-		})(o.Retain__),
-		Expire__: (func(x *RetentionPolicyExpire) *RetentionPolicyExpire {
-			if x == nil {
-				return nil
-			}
-			tmp := (*x).DeepCopy()
-			return &tmp
-		})(o.Expire__),
-	}
-}
-
-type RetentionPolicyRetain struct {
-}
-
-func (o RetentionPolicyRetain) DeepCopy() RetentionPolicyRetain {
-	return RetentionPolicyRetain{}
-}
-
-type RetentionPolicyExpire struct {
-	Age gregor1.DurationSec `codec:"age" json:"age"`
-}
-
-func (o RetentionPolicyExpire) DeepCopy() RetentionPolicyExpire {
-	return RetentionPolicyExpire{
-		Age: o.Age.DeepCopy(),
-	}
-}
-
 type AssetMetadataImage struct {
 	Width  int `codec:"width" json:"width"`
 	Height int `codec:"height" json:"height"`
@@ -867,7 +745,6 @@ type MessageBody struct {
 	Leave__              *MessageLeave                `codec:"leave,omitempty" json:"leave,omitempty"`
 	System__             *MessageSystem               `codec:"system,omitempty" json:"system,omitempty"`
 	Deletehistory__      *MessageDeleteHistory        `codec:"deletehistory,omitempty" json:"deletehistory,omitempty"`
-	Retention__          *MessageRetentionPolicy      `codec:"retention,omitempty" json:"retention,omitempty"`
 }
 
 func (o *MessageBody) MessageType() (ret MessageType, err error) {
@@ -925,11 +802,6 @@ func (o *MessageBody) MessageType() (ret MessageType, err error) {
 	case MessageType_DELETEHISTORY:
 		if o.Deletehistory__ == nil {
 			err = errors.New("unexpected nil value for Deletehistory__")
-			return ret, err
-		}
-	case MessageType_RETENTION:
-		if o.Retention__ == nil {
-			err = errors.New("unexpected nil value for Retention__")
 			return ret, err
 		}
 	}
@@ -1046,16 +918,6 @@ func (o MessageBody) Deletehistory() (res MessageDeleteHistory) {
 	return *o.Deletehistory__
 }
 
-func (o MessageBody) Retention() (res MessageRetentionPolicy) {
-	if o.MessageType__ != MessageType_RETENTION {
-		panic("wrong case accessed")
-	}
-	if o.Retention__ == nil {
-		return
-	}
-	return *o.Retention__
-}
-
 func NewMessageBodyWithText(v MessageText) MessageBody {
 	return MessageBody{
 		MessageType__: MessageType_TEXT,
@@ -1130,13 +992,6 @@ func NewMessageBodyWithDeletehistory(v MessageDeleteHistory) MessageBody {
 	return MessageBody{
 		MessageType__:   MessageType_DELETEHISTORY,
 		Deletehistory__: &v,
-	}
-}
-
-func NewMessageBodyWithRetention(v MessageRetentionPolicy) MessageBody {
-	return MessageBody{
-		MessageType__: MessageType_RETENTION,
-		Retention__:   &v,
 	}
 }
 
@@ -1220,13 +1075,6 @@ func (o MessageBody) DeepCopy() MessageBody {
 			tmp := (*x).DeepCopy()
 			return &tmp
 		})(o.Deletehistory__),
-		Retention__: (func(x *MessageRetentionPolicy) *MessageRetentionPolicy {
-			if x == nil {
-				return nil
-			}
-			tmp := (*x).DeepCopy()
-			return &tmp
-		})(o.Retention__),
 	}
 }
 
@@ -3938,14 +3786,6 @@ type PostDeleteHistoryByAgeArg struct {
 	Age              gregor1.DurationSec          `codec:"age" json:"age"`
 }
 
-type PostRetentionPolicyArg struct {
-	ConversationID   ConversationID               `codec:"conversationID" json:"conversationID"`
-	TlfName          string                       `codec:"tlfName" json:"tlfName"`
-	TlfPublic        bool                         `codec:"tlfPublic" json:"tlfPublic"`
-	IdentifyBehavior keybase1.TLFIdentifyBehavior `codec:"identifyBehavior" json:"identifyBehavior"`
-	Policy           MessageRetentionPolicy       `codec:"policy" json:"policy"`
-}
-
 type SetConversationStatusLocalArg struct {
 	ConversationID   ConversationID               `codec:"conversationID" json:"conversationID"`
 	Status           ConversationStatus           `codec:"status" json:"status"`
@@ -4110,6 +3950,16 @@ type AddTeamMemberAfterResetArg struct {
 	ConvID   ConversationID `codec:"convID" json:"convID"`
 }
 
+type SetConvRetentionLocalArg struct {
+	ConvID ConversationID  `codec:"convID" json:"convID"`
+	Policy RetentionPolicy `codec:"policy" json:"policy"`
+}
+
+type SetTeamRetentionLocalArg struct {
+	TeamID keybase1.TeamID `codec:"teamID" json:"teamID"`
+	Policy RetentionPolicy `codec:"policy" json:"policy"`
+}
+
 type LocalInterface interface {
 	GetThreadLocal(context.Context, GetThreadLocalArg) (GetThreadLocalRes, error)
 	GetCachedThread(context.Context, GetCachedThreadArg) (GetThreadLocalRes, error)
@@ -4128,7 +3978,6 @@ type LocalInterface interface {
 	PostMetadata(context.Context, PostMetadataArg) (PostLocalRes, error)
 	PostDeleteHistoryUpto(context.Context, PostDeleteHistoryUptoArg) (PostLocalRes, error)
 	PostDeleteHistoryByAge(context.Context, PostDeleteHistoryByAgeArg) (PostLocalRes, error)
-	PostRetentionPolicy(context.Context, PostRetentionPolicyArg) (PostLocalRes, error)
 	SetConversationStatusLocal(context.Context, SetConversationStatusLocalArg) (SetConversationStatusLocalRes, error)
 	NewConversationLocal(context.Context, NewConversationLocalArg) (NewConversationLocalRes, error)
 	GetInboxSummaryForCLILocal(context.Context, GetInboxSummaryForCLILocalQuery) (GetInboxSummaryForCLILocalRes, error)
@@ -4155,6 +4004,8 @@ type LocalInterface interface {
 	GetGlobalAppNotificationSettingsLocal(context.Context) (GlobalAppNotificationSettings, error)
 	UnboxMobilePushNotification(context.Context, UnboxMobilePushNotificationArg) (string, error)
 	AddTeamMemberAfterReset(context.Context, AddTeamMemberAfterResetArg) error
+	SetConvRetentionLocal(context.Context, SetConvRetentionLocalArg) error
+	SetTeamRetentionLocal(context.Context, SetTeamRetentionLocalArg) error
 }
 
 func LocalProtocol(i LocalInterface) rpc.Protocol {
@@ -4424,22 +4275,6 @@ func LocalProtocol(i LocalInterface) rpc.Protocol {
 						return
 					}
 					ret, err = i.PostDeleteHistoryByAge(ctx, (*typedArgs)[0])
-					return
-				},
-				MethodType: rpc.MethodCall,
-			},
-			"postRetentionPolicy": {
-				MakeArg: func() interface{} {
-					ret := make([]PostRetentionPolicyArg, 1)
-					return &ret
-				},
-				Handler: func(ctx context.Context, args interface{}) (ret interface{}, err error) {
-					typedArgs, ok := args.(*[]PostRetentionPolicyArg)
-					if !ok {
-						err = rpc.NewTypeError((*[]PostRetentionPolicyArg)(nil), args)
-						return
-					}
-					ret, err = i.PostRetentionPolicy(ctx, (*typedArgs)[0])
 					return
 				},
 				MethodType: rpc.MethodCall,
@@ -4855,6 +4690,38 @@ func LocalProtocol(i LocalInterface) rpc.Protocol {
 				},
 				MethodType: rpc.MethodCall,
 			},
+			"setConvRetentionLocal": {
+				MakeArg: func() interface{} {
+					ret := make([]SetConvRetentionLocalArg, 1)
+					return &ret
+				},
+				Handler: func(ctx context.Context, args interface{}) (ret interface{}, err error) {
+					typedArgs, ok := args.(*[]SetConvRetentionLocalArg)
+					if !ok {
+						err = rpc.NewTypeError((*[]SetConvRetentionLocalArg)(nil), args)
+						return
+					}
+					err = i.SetConvRetentionLocal(ctx, (*typedArgs)[0])
+					return
+				},
+				MethodType: rpc.MethodCall,
+			},
+			"setTeamRetentionLocal": {
+				MakeArg: func() interface{} {
+					ret := make([]SetTeamRetentionLocalArg, 1)
+					return &ret
+				},
+				Handler: func(ctx context.Context, args interface{}) (ret interface{}, err error) {
+					typedArgs, ok := args.(*[]SetTeamRetentionLocalArg)
+					if !ok {
+						err = rpc.NewTypeError((*[]SetTeamRetentionLocalArg)(nil), args)
+						return
+					}
+					err = i.SetTeamRetentionLocal(ctx, (*typedArgs)[0])
+					return
+				},
+				MethodType: rpc.MethodCall,
+			},
 		},
 	}
 }
@@ -4945,11 +4812,6 @@ func (c LocalClient) PostDeleteHistoryUpto(ctx context.Context, __arg PostDelete
 
 func (c LocalClient) PostDeleteHistoryByAge(ctx context.Context, __arg PostDeleteHistoryByAgeArg) (res PostLocalRes, err error) {
 	err = c.Cli.Call(ctx, "chat.1.local.postDeleteHistoryByAge", []interface{}{__arg}, &res)
-	return
-}
-
-func (c LocalClient) PostRetentionPolicy(ctx context.Context, __arg PostRetentionPolicyArg) (res PostLocalRes, err error) {
-	err = c.Cli.Call(ctx, "chat.1.local.postRetentionPolicy", []interface{}{__arg}, &res)
 	return
 }
 
@@ -5088,5 +4950,15 @@ func (c LocalClient) UnboxMobilePushNotification(ctx context.Context, __arg Unbo
 
 func (c LocalClient) AddTeamMemberAfterReset(ctx context.Context, __arg AddTeamMemberAfterResetArg) (err error) {
 	err = c.Cli.Call(ctx, "chat.1.local.addTeamMemberAfterReset", []interface{}{__arg}, nil)
+	return
+}
+
+func (c LocalClient) SetConvRetentionLocal(ctx context.Context, __arg SetConvRetentionLocalArg) (err error) {
+	err = c.Cli.Call(ctx, "chat.1.local.setConvRetentionLocal", []interface{}{__arg}, nil)
+	return
+}
+
+func (c LocalClient) SetTeamRetentionLocal(ctx context.Context, __arg SetTeamRetentionLocalArg) (err error) {
+	err = c.Cli.Call(ctx, "chat.1.local.setTeamRetentionLocal", []interface{}{__arg}, nil)
 	return
 }

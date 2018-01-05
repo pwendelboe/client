@@ -82,24 +82,6 @@ protocol local {
     MessageID upto;
   }
 
-  enum RetentionPolicyType {
-    NONE_0,
-    RETAIN_1,
-    EXPIRE_2
-  }
-
-  variant MessageRetentionPolicy switch (RetentionPolicyType typ){
-    case RETAIN: RetentionPolicyRetain;
-    case EXPIRE: RetentionPolicyExpire;
-  }
-
-  record RetentionPolicyRetain {}
-
-  record RetentionPolicyExpire {
-    // Delete messages older than this.
-    gregor1.DurationSec age;
-  }
-
   record AssetMetadataImage {
     int width;
     int height;
@@ -182,7 +164,6 @@ protocol local {
     case LEAVE: MessageLeave;
     case SYSTEM: MessageSystem;
     case DELETEHISTORY: MessageDeleteHistory;
-    case RETENTION: MessageRetentionPolicy;
   }
 
   enum OutboxStateType {
@@ -610,7 +591,6 @@ protocol local {
   PostLocalRes postMetadata(ConversationID conversationID, string tlfName, boolean tlfPublic, string channelName, keybase1.TLFIdentifyBehavior identifyBehavior);
   PostLocalRes postDeleteHistoryUpto(ConversationID conversationID, string tlfName, boolean tlfPublic, keybase1.TLFIdentifyBehavior identifyBehavior, MessageID upto);
   PostLocalRes postDeleteHistoryByAge(ConversationID conversationID, string tlfName, boolean tlfPublic, keybase1.TLFIdentifyBehavior identifyBehavior, gregor1.DurationSec age);
-  PostLocalRes postRetentionPolicy(ConversationID conversationID, string tlfName, boolean tlfPublic, keybase1.TLFIdentifyBehavior identifyBehavior, MessageRetentionPolicy policy);
 
   @lint("ignore")
   SetConversationStatusLocalRes SetConversationStatusLocal(ConversationID conversationID, ConversationStatus status, keybase1.TLFIdentifyBehavior identifyBehavior);
@@ -789,5 +769,8 @@ protocol local {
 
   // Convenience interface for adding someone back to a reset team convo
   void addTeamMemberAfterReset(string username, ConversationID convID);
+
+  void setConvRetentionLocal(ConversationID convID, RetentionPolicy policy);
+  void setTeamRetentionLocal(keybase1.TeamID teamID, RetentionPolicy policy);
 
 }

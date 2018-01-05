@@ -891,6 +891,33 @@ func (s *HybridConversationSource) GetMessagesWithRemotes(ctx context.Context,
 	return res, nil
 }
 
+func (s *RemoteConversationSource) Expunge(ctx context.Context,
+	convID chat1.ConversationID, uid gregor1.UID, expunge chat1.Expunge) error {
+	return nil
+}
+
+// Expunge from storage and maybe notify the gui of staleness
+func (s *HybridConversationSource) Expunge(ctx context.Context,
+	convID chat1.ConversationID, uid gregor1.UID, expunge chat1.Expunge) error {
+
+	// @@@ TODO might this deadlock because of SendChatStaleNotifications?
+	s.lockTab.Acquire(ctx, uid, convID)
+	defer s.lockTab.Release(ctx, uid, convID)
+
+	mergeRes, err := s.storage.Expunge(ctx, convID, uid, expunge)
+	if err != nil {
+		return err
+	}
+	if mergeRes.DeletedHistory {
+		supdate := []chat1.ConversationStaleUpdate{chat1.ConversationStaleUpdate{
+			ConvID:     convID,
+			UpdateType: chat1.StaleUpdateType_CLEAR,
+		}}
+		s.G().Syncer.SendChatStaleNotifications(ctx, uid, supdate, false)
+	}
+	return nil
+}
+
 // Merge with storage and maybe notify the gui of staleness
 func (s *HybridConversationSource) mergeMaybeNotify(ctx context.Context,
 	convID chat1.ConversationID, uid gregor1.UID, msgs []chat1.MessageUnboxed) error {

@@ -126,8 +126,7 @@
         "JOIN_9",
         "LEAVE_10",
         "SYSTEM_11",
-        "DELETEHISTORY_12",
-        "RETENTION_13"
+        "DELETEHISTORY_12"
       ],
       "go": "nostring"
     },
@@ -442,6 +441,20 @@
     },
     {
       "type": "record",
+      "name": "Expunge",
+      "fields": [
+        {
+          "type": "MessageID",
+          "name": "upto"
+        },
+        {
+          "type": "MessageID",
+          "name": "basis"
+        }
+      ]
+    },
+    {
+      "type": "record",
       "name": "ConversationMetadata",
       "fields": [
         {
@@ -475,6 +488,10 @@
         {
           "type": "ConversationVers",
           "name": "version"
+        },
+        {
+          "type": "Expunge",
+          "name": "expunge"
         },
         {
           "type": [
@@ -755,13 +772,6 @@
           "name": "deleteHistory"
         },
         {
-          "type": [
-            null,
-            "MessageRetentionPolicy"
-          ],
-          "name": "retentionPolicy"
-        },
-        {
           "type": "gregor1.UID",
           "name": "sender"
         },
@@ -991,6 +1001,67 @@
           "body": "InboxViewFull"
         }
       ]
+    },
+    {
+      "type": "enum",
+      "name": "RetentionPolicyType",
+      "symbols": [
+        "NONE_0",
+        "RETAIN_1",
+        "EXPIRE_2",
+        "INHERIT_3"
+      ]
+    },
+    {
+      "type": "variant",
+      "name": "RetentionPolicy",
+      "switch": {
+        "type": "RetentionPolicyType",
+        "name": "typ"
+      },
+      "cases": [
+        {
+          "label": {
+            "name": "RETAIN",
+            "def": false
+          },
+          "body": "RpRetain"
+        },
+        {
+          "label": {
+            "name": "EXPIRE",
+            "def": false
+          },
+          "body": "RpExpire"
+        },
+        {
+          "label": {
+            "name": "INHERIT",
+            "def": false
+          },
+          "body": "RpInherit"
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "RpRetain",
+      "fields": []
+    },
+    {
+      "type": "record",
+      "name": "RpExpire",
+      "fields": [
+        {
+          "type": "gregor1.DurationSec",
+          "name": "age"
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "RpInherit",
+      "fields": []
     }
   ],
   "messages": {},

@@ -1054,21 +1054,9 @@ func (b *Boxer) preBoxCheck(ctx context.Context, messagePlaintext chat1.MessageP
 		if *dhHeader != body {
 			return e("header-body mismatch")
 		}
-	case chat1.MessageType_RETENTION:
-		body := messagePlaintext.MessageBody.Retention()
-		rHeader := messagePlaintext.ClientHeader.RetentionPolicy
-		if rHeader == nil {
-			return e("missing header")
-		}
-		if *rHeader != body {
-			return e("header-body mismatch")
-		}
 	default:
 		if messagePlaintext.ClientHeader.DeleteHistory != nil {
 			return e("cannot have delete-history header")
-		}
-		if messagePlaintext.ClientHeader.RetentionPolicy != nil {
-			return e("cannot have retention policy header")
 		}
 	}
 

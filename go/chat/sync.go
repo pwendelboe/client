@@ -313,12 +313,20 @@ func (s *Syncer) sync(ctx context.Context, cli chat1.RemoteInterface, uid gregor
 			vers, incr.Vers, len(incr.Convs))
 
 		var iboxSyncRes storage.InboxSyncRes
-		if iboxSyncRes, err = ibox.Sync(ctx, incr.Vers, incr.Convs); err != nil {
+		if iboxSyncRes, err = ibox.SyncXXX(ctx, incr.Vers, incr.Convs); err != nil {
 			s.Debug(ctx, "Sync: failed to sync conversations to inbox: %s", err.Error())
 
 			// Send notifications for a full clear
 			s.G().NotifyRouter.HandleChatInboxSynced(ctx, kuid, chat1.NewChatSyncResultWithClear())
 		} else {
+			for _, expunge := range iboxSyncRes.Expunges {
+				// @@@ TODO is it ok to access convsource here like this?
+				err := s.G().ConvSource.Expunge(ctx, expunge.ConvID, uid, expunge.Expunge)
+				if err != nil {
+					s.Debug(ctx, "Sync: failed to expunge: %v", err)
+				}
+			}
+
 			if s.shouldDoFullReloadFromIncremental(ctx, iboxSyncRes, incr.Convs) {
 				// If we get word we shoudl full clear the inbox (like if the user left a conversation),
 				// then just reload everything
