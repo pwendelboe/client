@@ -3,6 +3,7 @@ import logger from '../logger'
 import React, {PureComponent} from 'react'
 import Emoji from './emoji'
 import Text from './text'
+import {type ConversationIDKey} from '../constants/types/chat'
 import parser, {emojiIndexByName, isPlainText} from '../markdown/parser'
 
 import type {Props as EmojiProps} from './emoji'
@@ -56,12 +57,8 @@ function preprocessMarkdown(markdown: string, meta: ?MarkdownMeta) {
   })
 }
 
-function isValidChannel(meta: ?MarkdownMeta, channel: string): boolean {
-  if (!meta) {
-    return false
-  }
-
-  return !!meta.channelNameToConvID[channel]
+function channelNameToConvID(meta: ?MarkdownMeta, channel: string): ?ConversationIDKey {
+  return meta && meta.channelNameToConvID && meta.channelNameToConvID[channel]
 }
 
 export function parseMarkdown(
@@ -76,7 +73,7 @@ export function parseMarkdown(
   try {
     return processAST(
       parser.parse(preprocessMarkdown(markdown || '', meta), {
-        isValidChannel: (channel: string) => isValidChannel(meta, channel),
+        channelNameToConvID: (channel: string) => channelNameToConvID(meta, channel),
       }),
       markdownCreateComponent
     )

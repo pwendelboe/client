@@ -132,8 +132,8 @@ Channel
  = ChannelMarker children:([0-9a-zA-Z_-]+) & {
   const channel = flatten(children)[0]
   return channel.length > 0 && channel.length <= 20 &&
-    options && options.isValidChannel && options.isValidChannel(channel)
-} { return {type: 'channel', children: flatten(children) } }
+    options && options.channelNameToConvID && options.channelNameToConvID(channel)
+} { return {type: 'channel', children: flatten(children), convID: options && options.channelNameToConvID && options.channelNameToConvID(flatten(children)[0]) } }
 
 InCodeBlock
  = children:(MentionlessMention / (!Ticks3 .))+ {return children }
