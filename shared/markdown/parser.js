@@ -198,7 +198,7 @@ function peg$parse(input, options) {
         return channel.length > 0 && channel.length <= 20 &&
           options && options.channelNameToConvID && options.channelNameToConvID(channel)
       },
-      peg$c45 = function(children) { return {type: 'channel', children: flatten(children) } },
+      peg$c45 = function(children) { return {type: 'channel', children: flatten(children), convID: options && options.channelNameToConvID && options.channelNameToConvID(flatten(children)[0]) } },
       peg$c46 = function(children) {return children },
       peg$c47 = function(children) { return {type: 'code-block', children: flatten(children)} },
       peg$c48 = function(children) {return children},

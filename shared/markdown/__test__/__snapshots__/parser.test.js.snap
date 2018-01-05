@@ -147,6 +147,7 @@ Object {
           "children": Array [
             "valid_channel",
           ],
+          "convID": "fakeConvID-valid_channel",
           "type": "channel",
         },
       ],
@@ -274,6 +275,7 @@ Object {
               "children": Array [
                 "valid_channel",
               ],
+              "convID": "fakeConvID-valid_channel",
               "type": "channel",
             },
           ],
@@ -299,6 +301,7 @@ Object {
               "children": Array [
                 "valid_channel",
               ],
+              "convID": "fakeConvID-valid_channel",
               "type": "channel",
             },
           ],
@@ -322,6 +325,7 @@ Object {
           "children": Array [
             "valid_channel_",
           ],
+          "convID": "fakeConvID-valid_channel_",
           "type": "channel",
         },
       ],
