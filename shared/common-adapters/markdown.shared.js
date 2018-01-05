@@ -58,7 +58,7 @@ function preprocessMarkdown(markdown: string, meta: ?MarkdownMeta) {
 }
 
 function channelNameToConvID(meta: ?MarkdownMeta, channel: string): ?ConversationIDKey {
-  return meta && meta.channelNameToConvID && meta.channelNameToConvID[channel]
+  return meta && meta.channelNameMentions && meta.channelNameMentions.get(channel)
 }
 
 export function parseMarkdown(
